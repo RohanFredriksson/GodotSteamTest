@@ -20,6 +20,8 @@ func _ready() -> void:
 	var steam_id: int = Steam.getSteamID()
 	var steam_username: String = Steam.getPersonaName()
 	
+	Steam.getPersonaName()
+	
 	if is_owned == false:
 		print("User does not own this game")
 		self.get_tree().quit()
@@ -68,12 +70,9 @@ func _get_friends_in_lobbies() -> Dictionary:
 		# Find game and lobby info.
 		var app_id = game_info['id']
 		var lobby = game_info['lobby']
-		print(str(steam_id) + ": " + str(game_info))
 		
 		# See if they are in the current game and have a lobby.
 		if app_id != Steam.getAppID() or lobby is String: continue
-		print(lobby is int)
-		
 		results[steam_id] = lobby
 	
 	return results
@@ -84,12 +83,16 @@ func _process(_delta: float) -> void:
 func _on_peer_connected(id):
 	
 	print(str(multiplayer.get_unique_id()) + ": PEER CONNECTED: " + str(id))
+	print(str(id) + " --> " + str(multiplayer.peer.get_steam_id_by_peer()))
+	print(Steam.getFriendPersonaName(multiplayer.peer.get_steam_id_by_peer()))
 	
 	if multiplayer.get_unique_id() == 1:
 		self.load_map.rpc_id(id)
 	
 func _on_peer_disconnected(id):
 	print(str(multiplayer.get_unique_id()) + ": PEER DISCONNECTED: " + str(id))
+	print(str(id) + " --> " + str(multiplayer.peer.get_steam_id_by_peer()))
+	print(Steam.getFriendPersonaName(multiplayer.peer.get_steam_id_by_peer()))
 
 @rpc("authority", "call_local", "reliable", 0)
 func load_map():
