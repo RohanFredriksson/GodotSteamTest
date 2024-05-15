@@ -39,19 +39,19 @@ func _host() -> void:
 	var peer = SteamMultiplayerPeer.new()
 	peer.create_lobby(SteamMultiplayerPeer.LOBBY_TYPE_FRIENDS_ONLY, 4)
 	multiplayer.multiplayer_peer = peer
-	print("HOSTING SERVER")
 
 func _connect() -> void:
 	
 	var friends = self._get_friends_in_lobbies()
 	if friends.is_empty(): return
 	
-	var lobby_id = friends.keys()[0]
+	# For now just use the first lobby id in the list.
+	# Ideally you would pick which friend you would like to join.
+	var lobby_id = friends[friends.keys()[0]]
 	
 	var peer = SteamMultiplayerPeer.new()
 	peer.connect_lobby(lobby_id)
 	multiplayer.multiplayer_peer = peer
-	print("CONNECTED TO SERVER")
 	
 func _get_friends_in_lobbies() -> Dictionary:
 
@@ -72,6 +72,8 @@ func _get_friends_in_lobbies() -> Dictionary:
 		
 		# See if they are in the current game and have a lobby.
 		if app_id != Steam.getAppID() or lobby is String: continue
+		print(lobby is int)
+		
 		results[steam_id] = lobby
 	
 	return results
@@ -80,7 +82,15 @@ func _process(_delta: float) -> void:
 	Steam.run_callbacks()
 
 func _on_peer_connected(id):
+	
 	print(str(multiplayer.get_unique_id()) + ": PEER CONNECTED: " + str(id))
+	
+	if multiplayer.get_unique_id() == 1:
+		self.load_map.rpc_id(id)
 	
 func _on_peer_disconnected(id):
 	print(str(multiplayer.get_unique_id()) + ": PEER DISCONNECTED: " + str(id))
+
+@rpc("authority", "call_local", "reliable", 0)
+func load_map():
+	print(str(multiplayer.get_unique_id()) + ": LOAD MAP")
