@@ -44,22 +44,33 @@ func _host() -> void:
 func _connect() -> void:
 	
 	var friends = self._get_friends_in_lobbies()
-	print(friends)
+	if friends.is_empty(): return
+	
+	var lobby_id = friends.keys()[0]
+	
+	var peer = SteamMultiplayerPeer.new()
+	peer.connect_lobby(lobby_id)
+	multiplayer.multiplayer_peer = peer
+	print("CONNECTED TO SERVER")
 	
 func _get_friends_in_lobbies() -> Dictionary:
-	
+
 	var results = {}
+	
+	# For all friends
 	for i in range(0, Steam.getFriendCount()):
 		
+		# Get the current game info for the player.
 		var steam_id = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
 		var game_info = Steam.getFriendGamePlayed(steam_id)
-	
 		if game_info.is_empty(): continue
 	
+		# Find game and lobby info.
 		var app_id = game_info['id']
 		var lobby = game_info['lobby']
-		#print(str(steam_id) + ": " + str(game_info))
+		print(str(steam_id) + ": " + str(game_info))
 		
+		# See if they are in the current game and have a lobby.
 		if app_id != Steam.getAppID() or lobby is String: continue
 		results[steam_id] = lobby
 	
