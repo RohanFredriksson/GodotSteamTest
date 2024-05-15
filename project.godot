@@ -15,10 +15,6 @@ run/main_scene="res://client.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[autoload]
-
-Global="*res://global.gd"
-
 [debug]
 
 file_logging/enable_file_logging=true
