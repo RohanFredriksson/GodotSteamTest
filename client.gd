@@ -24,17 +24,46 @@ func _ready() -> void:
 		print("User does not own this game")
 		self.get_tree().quit()
 	
+	print("is_on_steam_deck: " + str(is_on_steam_deck))
+	print("is_online: " + str(is_online))
+	print("is_owned: " + str(is_owned))
+	print("steam_id: " + str(steam_id))
+	print("steam_username: " + str(steam_username))
+	
 	# Multiplayer signals.
 	multiplayer.peer_connected.connect(self._on_peer_connected)
 	multiplayer.peer_disconnected.connect(self._on_peer_disconnected)
-	
-	# For now lets just host the server.
-	self._host()
 
 func _host() -> void:
+	
 	var peer = SteamMultiplayerPeer.new()
 	peer.create_lobby(SteamMultiplayerPeer.LOBBY_TYPE_FRIENDS_ONLY, 4)
 	multiplayer.multiplayer_peer = peer
+	print("HOSTING SERVER")
+
+func _connect() -> void:
+	
+	var friends = self._get_friends_in_lobbies()
+	print(friends)
+	
+func _get_friends_in_lobbies() -> Dictionary:
+	
+	var results = {}
+	for i in range(0, Steam.getFriendCount()):
+		
+		var steam_id = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
+		var game_info = Steam.getFriendGamePlayed(steam_id)
+	
+		if game_info.is_empty(): continue
+	
+		var app_id = game_info['id']
+		var lobby = game_info['lobby']
+		#print(str(steam_id) + ": " + str(game_info))
+		
+		if app_id != Steam.getAppID() or lobby is String: continue
+		results[steam_id] = lobby
+	
+	return results
 
 func _process(_delta: float) -> void:
 	Steam.run_callbacks()
