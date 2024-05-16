@@ -13,13 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build Windows Application
+    - name: Prepare Build Directory
       run: |
         # Clear the build directory
         if (Test-Path "build") {Remove-Item -Path "build" -Recurse -Force}
+
+        # Create a new build directory
         New-Item -ItemType Directory -Path "build"
 
-        # Prepare the required Godot Editor
+    - name: Prepare Godot Editor
+      run: |
+        # Download the Godot Editor
         if (-not (Test-Path "godot")) {
             New-Item -ItemType Directory -Path "godot"
             $client = new-object System.Net.WebClient
@@ -30,10 +34,15 @@ jobs:
             cd ..
         }
 
-        # Build the application
-        .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --headless --path . --export-release "Windows Desktop" .\build\godotsteamtest.exe
-        Copy-Item -Path ".\godot\steam_api64.dll" -Destination ".\build\"
+    - name: Build the Windows Application
+      run: |
+        # Build the Windows Application
+        Start-Process -FilePath ".\godot\godotsteam.multiplayer.422.editor.windows.64.exe" -ArgumentList "--headless --path . --export-release 'Windows Desktop' .\build\godotsteamtest.exe" -Wait
 
+    - name: Copy the Steam API
+      run: |
+        # Copy the Steam API
+        Copy-Item -Path ".\godot\steam_api64.dll" -Destination ".\build\"
 
     - name: Push to Releases Of Radiance Repository
       env:
