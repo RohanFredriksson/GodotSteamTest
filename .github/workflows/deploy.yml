@@ -37,7 +37,8 @@ jobs:
     - name: Build the Windows Application
       run: |
         # Build the Windows Application
-        Start-Process -FilePath ".\godot\godotsteam.multiplayer.422.editor.windows.64.exe" -ArgumentList "--headless --path . --export-release 'Windows Desktop' .\build\godotsteamtest.exe" -Wait
+        .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --headless --path . --export-release 'Windows Desktop' .\build\godotsteamtest.exe
+        ls build
 
     - name: Copy the Steam API
       run: |
