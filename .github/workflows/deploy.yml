@@ -38,7 +38,10 @@ jobs:
       run: |
         # Build the Windows Application
         .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --headless --path . --export-release 'Windows Desktop' .\build\godotsteamtest.exe
-        ls build
+        while (-not (Test-Path ".\build\godotsteamtest.exe")) {
+          Write-Host "Waiting for file..."
+          Start-Sleep -Seconds 10
+        }
 
     - name: Copy the Steam API
       run: |
