@@ -31,23 +31,21 @@ jobs:
         }
 
         # Build the application
-        .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --path . --export-release "Windows Desktop" .\build\godotsteamtest.exe
+        .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --headless --path . --export-release "Windows Desktop" .\build\godotsteamtest.exe
         Copy-Item -Path ".\godot\steam_api64.dll" -Destination ".\build\"
 
 
-    - name: Deploy to gh-pages
+    - name: Push to Releases Of Radiance Repository
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         EMAIL: ${{ secrets.EMAIL }}
       run: |
-        # Configure git
-        git config --global user.name "Rohan Fredriksson"
-        git config --global user.email $EMAIL
-        git config --global pull.rebase false
-
         # Initialise a new repository.
         cd build
         git init
+        git config --global user.name "Rohan Fredriksson"
+        git config --global user.email $EMAIL
+        git config --global pull.rebase false
         git add .
         git commit -m "Release"
         git branch -M master
