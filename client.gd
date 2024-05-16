@@ -22,6 +22,7 @@ func _ready() -> void:
 	
 	Steam.getPersonaName()
 	
+	# If the user doesn't own the game they shouldn't run it.
 	if is_owned == false:
 		print("User does not own this game")
 		self.get_tree().quit()
