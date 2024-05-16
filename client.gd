@@ -83,17 +83,15 @@ func _process(_delta: float) -> void:
 func _on_peer_connected(id):
 	
 	print(str(multiplayer.get_unique_id()) + ": PEER CONNECTED: " + str(id))
-	print(str(id) + " --> " + str(multiplayer.multiplayer_peer.get_steam_id_by_peer(id)))
-	print(Steam.getFriendPersonaName(multiplayer.multiplayer_peer.get_steam_id_by_peer(id)))
-	
+	var steam_id = multiplayer.multiplayer_peer.get_steam64_from_peer_id(id)
+
 	if multiplayer.get_unique_id() == 1:
 		self.load_map.rpc_id(id)
 	
 func _on_peer_disconnected(id):
 	
 	print(str(multiplayer.get_unique_id()) + ": PEER DISCONNECTED: " + str(id))
-	print(str(id) + " --> " + str(multiplayer.multiplayer_peer.get_steam_id_by_peer(id)))
-	print(Steam.getFriendPersonaName(multiplayer.multiplayer_peer.get_steam_id_by_peer(id)))
+	var steam_id = multiplayer.multiplayer_peer.get_steam64_from_peer_id(id)
 
 @rpc("authority", "call_local", "reliable", 0)
 func load_map():
