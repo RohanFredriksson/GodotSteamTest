@@ -49,5 +49,5 @@ jobs:
         git add .
         git commit -m "Release"
         git branch -M master
-        git remote add origin https://github.com/RohanFredriksson/ReleasesOfRadiance.git
+        git remote add origin https://${{ secrets.TOKEN }}@github.com/RohanFredriksson/ReleasesOfRadiance.git
         git push -uf origin master
