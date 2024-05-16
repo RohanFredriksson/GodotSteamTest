@@ -1,0 +1,55 @@
+name: Build and Deploy Windows Application
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Windows Application
+      run: |
+        # Clear the build directory
+        if (Test-Path "build") {Remove-Item -Path "build" -Recurse -Force}
+        New-Item -ItemType Directory -Path "build"
+
+        # Prepare the required Godot Editor
+        if (-not (Test-Path "godot")) {
+            New-Item -ItemType Directory -Path "godot"
+            $client = new-object System.Net.WebClient
+            $client.DownloadFile("https://github.com/GodotSteam/GodotSteam/releases/download/v4.7-mp/win64-g422-s159-gs47-mp.zip",".\godot\godot.zip")
+            cd godot
+            tar -xf godot.zip
+            del godot.zip
+            cd ..
+        }
+
+        # Build the application
+        .\godot\godotsteam.multiplayer.422.editor.windows.64.exe --path . --export-release "Windows Desktop" .\build\godotsteamtest.exe
+        Copy-Item -Path ".\godot\steam_api64.dll" -Destination ".\build\"
+
+
+    - name: Deploy to gh-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        EMAIL: ${{ secrets.EMAIL }}
+      run: |
+        # Configure git
+        git config --global user.name "Rohan Fredriksson"
+        git config --global user.email $EMAIL
+        git config --global pull.rebase false
+
+        # Initialise a new repository.
+        cd build
+        git init
+        git add .
+        git commit -m "Release"
+        git branch -M master
+        git remote add origin https://github.com/RohanFredriksson/ReleasesOfRadiance.git
+        git push -uf origin master
